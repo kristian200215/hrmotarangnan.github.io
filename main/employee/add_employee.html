@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Employee Record</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        .service-period {
+            border: 1px solid #0b0b0b;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Add Employee Record</h2>
+        <form action="add_employee.php" method="post" id="employeeForm">
+            <div class="form-group">
+                <label for="first_name">First Name:</label>
+                <input type="text" class="form-control" id="first_name" name="first_name" required>
+            </div>
+            <div class="form-group">
+                <label for="middle_name">Middle Name:</label>
+                <input type="text" class="form-control" id="middle_name" name="middle_name">
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name:</label>
+                <input type="text" class="form-control" id="last_name" name="last_name" required>
+            </div>
+            <div class="form-group">
+                <label for="contact_number">Contact Number:</label>
+                <input type="text" class="form-control" id="contact_number" name="contact_number">
+            </div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <input type="text" class="form-control" id="address" name="address">
+            </div>
+            <div class="form-group">
+                <label for="birthday">Birthday:</label>
+                <input type="date" class="form-control" id="birthday" name="birthday" required>
+            </div>
+            
+
+       
+            <div id="servicePeriodsSection">
+          
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="addServicePeriod()">Add Service Period</button>
+            <br><br>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+        
+            addServicePeriod();
+    
+           
+            $('#servicePeriodsSection').on('click', '.remove-service-period', function() {
+                $(this).closest('.service-period').remove();
+            });
+        });
+    
+        function addServicePeriod() {
+            var servicePeriodHtml = `
+    <div class="service-period">
+        <h4 style:"color: red";> Service Period </h4>
+        <div class="form-group">
+            <label>Start Date:</label>
+            <input type="date" class="form-control" name="start_date[]" required>
+        </div>
+        <div class="form-group">
+            <label>End Date:</label>
+            <input type="date" class="form-control" name="end_date[]">
+        </div>
+        <div class="form-group">
+            <label>Department:</label>
+            <select class="form-control department-select" name="department[]" required onchange="fetchPositions(this, this.value)">
+                <option value="">Select Department</option>
+                <!-- Department options will be loaded here dynamically -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Position:</label>
+            <select class="form-control position-select" name="position[]" required>
+                <option value="">Select Position</option>
+                <!-- Position options will be loaded here based on selected Department -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="salary">Annual Salary:</label>
+            <input type="number" step="0.01" class="form-control" name="salary[]" required>
+        </div>
+       
+        <div class="form-group">
+            <label for="employment_type">Employment Type:</label>
+            <select class="form-control" name="employment_type[]" required>
+                <option value="">Select Employment Type</option>
+                <option value="Casual">Casual</option>
+                <option value="Permanent">Permanent</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="station_assignment">Station Assignment:</label>
+            <input type="text" class="form-control" name="station_assignment[]">
+        </div>
+        <div class="form-group">
+            <label for="branch_type">Branch Type:</label>
+            <select class="form-control" name="branch_type[]" required>
+                <option value="">Select Branch Type</option>
+                <option value="Local">Local</option>
+                <option value="National">National</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="employee_status">Employee Status:</label>
+            <select class="form-control" name="employee_status[]" required>
+                <option value="Active">Active</option>
+                <option value="Retired">Retired</option>
+                <option value="Transferred">Transferred</option>
+                <option value="Resigned">Resigned</option>
+                <option value="Promoted">Promoted</option>
+                <option value="End Of Term">End Of Term</option>
+            </select>
+        </div>
+        <button type="button" class="btn btn-danger remove-service-period">Remove</button>
+    </div>
+`;
+
+    
+            $('#servicePeriodsSection').append(servicePeriodHtml);
+       
+            fetchDepartments($('.department-select').last());
+        }
+    
+  
+        function fetchDepartments(element) {
+            $.ajax({
+                url: 'get_departments.php', 
+                type: 'GET',
+                success: function(response) {
+                    $(element).html(response);
+                }
+            });
+        }
+    
+
+        window.fetchPositions = function(element, departmentId) {
+            if (departmentId) {
+                $.ajax({
+                    url: 'get_positions.php', 
+                    type: 'GET',
+                    data: { department_id: departmentId },
+                    success: function(response) {
+                        $(element).closest('.service-period').find('.position-select').html(response);
+                    }
+                });
+            }
+        }
+    </script>
+    
+</body>
+</html>
